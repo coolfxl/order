@@ -66,7 +66,9 @@
                         <div class="chooseok" @click="okclose">选好了</div>
                     </div>
                 </div>
-                <div class="close" @click="close()">X</div>
+                <div class="close" @click="close()">
+                    <img src="../../assets/images/fail.png" width="20" height="20" alt="删除">
+                </div>
             </div>
         </transition>
 
@@ -3707,7 +3709,7 @@ export default {
                 .choosedetail
                     width 315px
                     height 434px
-                    margin 115px auto
+                    margin calc(50vh - 217px) auto
                     background #fff
                     border-radius 5px
                     overflow hidden
@@ -3796,9 +3798,9 @@ export default {
                 font-size 18px
                 position absolute
                 right calc(50vw - 10px)
-                top 45px
+                top calc(50vh - 237px)
                 z-index 100
-                background #fff
+                background #000
                 border-radius 50%
 
 

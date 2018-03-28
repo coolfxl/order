@@ -20,7 +20,10 @@
         <div class="shopcart-list" v-show="listShow">
           <div class="list-header">
             <h1 class="title">购物车</h1>
-            <span class="empty" @click="empty">清空</span>
+            <span class="empty" @click="empty">
+              <img src="../../assets/images/delete.png" width="15" height="15" alt="删除" style="vertical-align:middle;">
+              <span>清空</span>
+            </span>
           </div>
           <div class="list-content" ref="listContent">
             <ul>
@@ -64,89 +67,15 @@
       <div class="mask" v-show="showconfirm" @click="hideconfirm"></div>
     </transition>
 
-
-    <transition name="slide">
-      <div class="place" v-show="showplace">
-        <div class="header">
-          <div class="content-wrapper">
-            <div class="content">
-              <div class="title">
-                <span class="brand">下单</span>
-                <span class="name">
-                  <img src="../../assets/images/back.png" alt="后退" width="15" height="21">
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="body">
-          <div class="desk">
-            <h3 class="title">15号桌</h3>
-            <span class="date">2018-10-11 10:11:23</span>
-          </div>
-          <div class="order" ref="order">
-            <ul>
-              <li class="food" v-for="(food, index) in selectFoods" :key="index">
-                <div>
-                  <span class="name">{{food.name}}</span>
-                  <span class="type">（{{food.format}}）</span>
-                </div>
-                <div class="price">
-                  <span>x5</span>
-                </div>
-                <div class="cartcontrol-wrapper">
-                  <span>￥{{food.price*food.count}}</span>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="total">
-          <div class="food">
-              <span class="name">总计:￥49.9</span>
-              <span class="type">满减优惠-20</span>
-          </div>
-          <div class="cartcontrol-wrapper">
-            <span>实付:<span style="font-size:18px;color:#C35F37;">29.9</span></span>
-          </div>
-        </div>
-        <div class="mark">
-          <h3 class="title">备注信息</h3>
-          <span class="content">快点做</span>
-        </div>
-        <div class="paytype">
-          <h4 class="title">选择支付方式</h4>
-          <div class="balance">
-            <div class="type">
-              <img src="../../assets/images/pay.png" alt="" width="30px" height="30px">
-            </div>
-            <div class="text">余额支付</div>
-            <div class="select">
-              <img src="../../assets/images/selected.png" alt="" width="20px" height="20px">
-            </div>
-          </div>
-          <div class="weixin">
-            <div class="type">
-              <img src="../../assets/images/wechat.png" alt="" width="30px" height="30px">
-            </div>
-            <div class="text">余额支付</div>
-            <div class="select">
-              <img src="../../assets/images/unselect.png" alt="" width="20px" height="20px">
-            </div>
-          </div>
-        </div>
-        <div class="sure">
-          <input type="button" class="loginon"  style="width: 280px;height:40px;background: #C35F37;" value="确定" @click="confirm" />
-        </div>
-      </div>
-    </transition>
-
+    <order :selectFoods="selectFoods" ref="order"></order>
   </div>
 </template>
 
 <script type="text/ecmascripts-6">
-import BScroll from 'better-scroll'; // 引入滚动样式
+import BScroll from 'better-scroll'
 import cartcontrol from 'com/cartcontrol/cartcontrol' 
+import order from 'com/order/order'
+
     export default {
       props: {
         selectFoods: {
@@ -191,7 +120,7 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
           dropBalls: [],
           fold: true,
           showconfirm: false,
-          showplace: true
+          showplace: false
         };
       },
       computed: {
@@ -219,7 +148,7 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
             return '去结算'
           }
         },
-        payClass() { // 动态绑定class
+        payClass() { 
           if (this.totalPrice < this.minPrice) {
             return 'not-enough'
           } else {
@@ -244,20 +173,16 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
             })
           }
           return show;
-        }
+        },
       },
       mounted() {
-        this.initscroll()
+        
       },
       components: {
-        cartcontrol
+        cartcontrol,
+        order
       },
       methods: {
-        initscroll() {
-          this.menuScroll = new BScroll(this.$refs.order, {
-              click: true // 默认派发点击事件 移动端点击只会出发一次，pc端点击的时候会触发两次
-          }); 
-        },
         toggleList() {
           if( !this.totalCount ){
             return;
@@ -273,7 +198,7 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
         hideList() {
           this.fold = true;
         },
-        pay() { // vue 中阻止点击事件的冒泡
+        pay() {
           if(this.totalPrice < this.minPrice){
             return
           }
@@ -283,13 +208,14 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
         },
         confirm() {
           this.showconfirm = !this.showconfirm
+          this.$refs.order.change()
         },
         hideconfirm() {
           if( !this.totalCount ){
             return;
           }
           this.showconfirm = !this.showconfirm
-        }
+        },
       }
     }
 </script>
@@ -312,7 +238,6 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
       display: flex
       background: #C15735
       font-size: 0
-      border-radius 10px
       .content-left
         flex: 1
         .logo-wrapper
@@ -389,7 +314,6 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
           font-size: 12px
           font-weight: 700
           color: #fff
-          border-radius 0 10px 0 0 
           &.not-enough
             background: #CE8841
           &.enough
@@ -420,7 +344,7 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
         .empty
           float: right 
           font-size: 12px
-          color: rgb(0, 160, 220)
+          color: #999
       .list-content
         padding: 0 18px
         max-height: 217px
@@ -518,198 +442,5 @@ import cartcontrol from 'com/cartcontrol/cartcontrol'
     &.shake-enter,&.shake-leave-active
       opacity: 0
       background: rgba(7, 17, 27, 0)
-  .place
-    position: fixed
-    top: 0
-    left: 0
-    width 100vw
-    height 100vh
-    z-index 70
-    background #fff
-    &.slide-enter-active,&.slide-leave
-      transition: all 0.5s
-      transform: translate3d(0, 0, 0)
-    &.slide-enter, &.slide-leave
-      transform: translate3d(100%, 0, 0) 
-    .header
-      height 64px
-      position relative
-      color #fff
-      background -webkit-linear-gradient(left,#C15735,#CE8841)
-      background -moz-linear-gradient(left,#C15735,#CE8841)
-      background linear-gradient(left,#C15735,#CE8841)
-      filter progid:DXImageTransform.Microsoft.gradient(startColorstr='#C15735',endColorstr='#CE8841',GradientType='1')
-      .content-wrapper
-        font-size 13px
-      .title
-        margin 30px 0 10px 0
-        text-align center
-        .brand
-          width 70px
-          height 24px
-          text-align center 
-          line-height 24px
-          font-size 17px
-          display inline-block
-        .name 
-          width 15px
-          height 21px
-          text-align center
-          line-height 30px
-          font-size 21px
-          display inline-block
-          position absolute
-          bottom 11px
-          left 15px
-    .body
-      width 100%
-      height 217px
-      margin-top 5px
-      overflow hidden
-      .desk
-        width 100%
-        height 28px
-        text-align center
-        line-height 28px
-        margin-top 15px
-        .title
-          display inline-block
-          font-family: PingFangSC-Medium;
-          font-size: 20px;
-          color: #555555;
-          letter-spacing: -0.48px;
-          float left
-          padding-left 15px
-        .date
-          display inline-block
-          float right
-          padding-right 15px
-      .order
-        padding: 0 18px
-        height: 217px
-        overflow: hidden
-        background: #fff
-        .food
-          position: relative
-          padding: 12px 25px 12px 15px
-          box-sizing: border-box
-          .name
-            display block 
-            line-height: 24px
-            font-size: 14px
-            font-family: PingFangSC-Medium;
-            color: #07111b
-          .type
-            display block 
-            margin-left -5px
-            font-size 10px
-            color #999
-          .price
-            font-family: PingFangSC-Medium;
-            letter-spacing: -0.34px;
-            position: absolute
-            right: 90px
-            bottom: 12px
-            line-height: 24px
-            font-size: 14px
-            font-weight: 700
-            color: #999
-          .cartcontrol-wrapper
-            position: absolute
-            right: 0
-            bottom: 20px
-            color #C35F37
-            font-size 12px
-    .total
-      width 100%
-      height 60px
-      margin-top 10px
-      position relative
-      .food
-        position: relative
-        padding: 12px 25px 12px 15px
-        box-sizing: border-box
-        border-1px(rgba(7, 17, 27, 0.1))
-        .name
-          display block 
-          line-height: 24px
-          font-size: 14px
-          font-family: PingFangSC-Medium;
-          color: #07111b
-          padding-left 17px
-        .type
-          display block 
-          margin-left 17px
-          font-size 10px
-          color #C35F37
-      .cartcontrol-wrapper
-        position: absolute
-        right: 0
-        bottom: 20px
-        color #C35F37
-        font-size 12px
-        padding-right 20px
-    .mark
-      width 100%
-      height 45px
-      margin-top 10px
-      .title
-        font-family: PingFangSC-Medium;
-        font-size: 12px;
-        color: #999999;
-        letter-spacing: 0
-        padding-left 15px
-      .content
-        display block
-        margin 15px 0 0 30px
-    .paytype
-      width 100%
-      height 125px
-      margin-top 30px
-      .title
-        font-family: PingFangSC-Medium;
-        font-size: 12px;
-        color: #999999;
-        letter-spacing: 0;
-        padding-left 15px
-      .balance
-        display flex
-        height 48px
-        text-align center
-        line-height 48px
-        .type
-          width 30px
-          margin 20px 0 0 30px
-        .text
-          width 64px
-          margin 12px 0 0 15px
-          font-family: PingFangSC-Medium;
-          font-size: 16px;
-          color: #555555;
-          letter-spacing: 0;
-        .select
-          width 20px
-          margin 17px 0 0 190px
-      .weixin
-        display flex
-        height 48px
-        text-align center
-        line-height 48px
-        .type
-          width 30px
-          margin 20px 0 0 30px
-        .text
-          width 64px
-          margin 12px 0 0 15px
-          font-family: PingFangSC-Medium;
-          font-size: 16px;
-          color: #555555;
-          letter-spacing: 0;
-        .select
-          width 20px
-          margin 17px 0 0 190px
-    .sure
-      text-align center
-      margin-top 30px
-      color #ffffff
+  
 </style>
